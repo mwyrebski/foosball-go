@@ -7,7 +7,7 @@ func TestGame(t *testing.T) {
 	assertGameState := func(t *testing.T, g *Game, s GameState) {
 		t.Helper()
 		if s != g.state {
-			t.Errorf("Expected game state to be %d, got %d", s, g.state)
+			t.Errorf("Expected game state to be %s, got %s", s, g.state)
 		}
 	}
 	assertScoresCount := func(t *testing.T, expected, actual int) {

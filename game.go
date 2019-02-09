@@ -15,6 +15,10 @@ type Game struct {
 	state       GameState
 }
 
+func (s GameState) String() string {
+	return [...]string{"NotStarted", "InProgress", "Finished"}[s]
+}
+
 func (g *Game) ScoreTeamA() {
 	g.scoresTeamA++
 	g.state = InProgress
