@@ -25,27 +25,42 @@ func TestNewGame(t *testing.T) {
 }
 
 func TestAddScore(t *testing.T) {
+	testCases := []struct {
+		desc                string
+		addScore            []Team
+		expectedScoresTeamA int
+		expectedScoresTeamB int
+	}{
+		{
+			desc:                "adding score for Team A",
+			addScore:            []Team{TeamA},
+			expectedScoresTeamA: 1,
+			expectedScoresTeamB: 0,
+		},
+		{
+			desc:                "adding score for Team B",
+			addScore:            []Team{TeamB},
+			expectedScoresTeamA: 0,
+			expectedScoresTeamB: 1,
+		},
+		{
+			desc:                "adding scores for Team A and Team B",
+			addScore:            []Team{TeamA, TeamB},
+			expectedScoresTeamA: 1,
+			expectedScoresTeamB: 1,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			g := NewGame()
 
-	t.Run("scoring for Team A", func(t *testing.T) {
-		g := NewGame()
-		const expected = 1
+			for _, team := range tc.addScore {
+				g.AddScore(team)
+			}
 
-		g.AddScore(TeamA)
-		actual := g.scoresTeamA
-
-		assertScoresCount(t, expected, actual)
-		assertGameState(t, g, InProgress)
-	})
-
-	t.Run("scoring for Team B", func(t *testing.T) {
-		g := NewGame()
-		const expected = 1
-
-		g.AddScore(TeamB)
-		actual := g.scoresTeamB
-
-		assertScoresCount(t, expected, actual)
-		assertGameState(t, g, InProgress)
-	})
-
+			assertScoresCount(t, tc.expectedScoresTeamA, g.scoresTeamA)
+			assertScoresCount(t, tc.expectedScoresTeamB, g.scoresTeamB)
+			assertGameState(t, g, InProgress)
+		})
+	}
 }
