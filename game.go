@@ -15,17 +15,27 @@ type Game struct {
 	state       GameState
 }
 
+type Team int
+
+const (
+	TeamA Team = 1
+	TeamB Team = 2
+)
+
 func (s GameState) String() string {
 	return [...]string{"NotStarted", "InProgress", "Finished"}[s]
 }
 
-func (g *Game) ScoreTeamA() {
-	g.scoresTeamA++
-	g.state = InProgress
+func (t Team) String() string {
+	return [...]string{"TeamA", "TeamB"}[t]
 }
 
-func (g *Game) ScoreTeamB() {
-	g.scoresTeamB++
+func (g *Game) AddScore(t Team) {
+	if t == TeamA {
+		g.scoresTeamA++
+	} else if t == TeamB {
+		g.scoresTeamB++
+	}
 	g.state = InProgress
 }
 
