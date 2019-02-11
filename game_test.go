@@ -4,8 +4,8 @@ import "testing"
 
 func assertGameState(t *testing.T, g *Game, s GameState) {
 	t.Helper()
-	if s != g.state {
-		t.Errorf("Expected game state to be %s, got %s", s, g.state)
+	if s != g.State() {
+		t.Errorf("Expected game state to be %s, got %s", s, g.State())
 	}
 }
 
@@ -21,6 +21,15 @@ func TestNewGame(t *testing.T) {
 	t.Run("new game should be in NotStarted state", func(t *testing.T) {
 		g := NewGame()
 		assertGameState(t, g, NotStarted)
+	})
+	t.Run("new game should have 0 scores", func(t *testing.T) {
+		g := NewGame()
+		if g.ScoreForTeam(TeamA) != 0 {
+			t.Error("Expected 0 score for TeamA")
+		}
+		if g.ScoreForTeam(TeamB) != 0 {
+			t.Error("Expected 0 score for TeamA")
+		}
 	})
 }
 
@@ -58,8 +67,8 @@ func TestAddScore(t *testing.T) {
 				g.AddScore(team)
 			}
 
-			assertScoresCount(t, tc.expectedScoresTeamA, g.scoresTeamA)
-			assertScoresCount(t, tc.expectedScoresTeamB, g.scoresTeamB)
+			assertScoresCount(t, tc.expectedScoresTeamA, g.ScoreForTeam(TeamA))
+			assertScoresCount(t, tc.expectedScoresTeamB, g.ScoreForTeam(TeamB))
 			assertGameState(t, g, InProgress)
 		})
 	}
