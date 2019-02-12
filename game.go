@@ -24,25 +24,27 @@ func (s GameState) String() string {
 }
 
 func (t Team) String() string {
-	return [...]string{"TeamA", "TeamB"}[t]
+	return [...]string{"TeamA", "TeamB"}[t-1]
 }
 
 func (g *Game) State() GameState {
 	if len(g.sets) == 0 {
 		return NotStarted
 	}
-	var wonTeamA, wonTeamB int
-	for _, s := range g.sets {
-		if s.WonByTeam(TeamA) {
-			wonTeamA++
-		} else if s.WonByTeam(TeamB) {
-			wonTeamB++
-		}
-	}
-	if wonTeamA == 2 || wonTeamB == 2 {
+	if g.WonByTeam(TeamA) || g.WonByTeam(TeamB) {
 		return Finished
 	}
 	return InProgress
+}
+
+func (g *Game) WonByTeam(t Team) bool {
+	var count int
+	for _, s := range g.sets {
+		if s.WonByTeam(t) {
+			count++
+		}
+	}
+	return count == 2
 }
 
 func (g *Game) AddScore(t Team) {
@@ -50,7 +52,7 @@ func (g *Game) AddScore(t Team) {
 	if len(g.sets) == 0 {
 		s = NewSet()
 		g.sets = append(g.sets, s)
-	} else {
+	} else if g.State() != Finished {
 		s = g.sets[len(g.sets)-1]
 		if s.Finished() {
 			s = NewSet()
