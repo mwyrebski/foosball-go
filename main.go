@@ -17,7 +17,7 @@ type GameModel struct {
 	WonByTeam string `json:",omitempty"`
 }
 
-var games []Game
+var games []*Game
 
 func BadRequest(w http.ResponseWriter) {
 	http.Error(w, fmt.Sprintf("%d %s", http.StatusBadRequest, http.StatusText(http.StatusBadRequest)), http.StatusBadRequest)
@@ -36,6 +36,15 @@ func toModel(g *Game) *GameModel {
 		}
 	}
 	return &model
+}
+
+func findGame(id int) *Game {
+	for _, g := range games {
+		if g.id == id {
+			return g
+		}
+	}
+	return nil
 }
 
 func handleGame(w http.ResponseWriter, r *http.Request) {
@@ -60,12 +69,7 @@ func handleGame(w http.ResponseWriter, r *http.Request) {
 			log.Printf("ID: %d", ID)
 		}
 		if ID > 0 {
-			var game *Game
-			for _, g := range games {
-				if g.id == ID {
-					game = &g
-				}
-			}
+			var game = findGame(ID)
 			if game != nil {
 				e.Encode(toModel(game))
 			} else {
@@ -74,15 +78,47 @@ func handleGame(w http.ResponseWriter, r *http.Request) {
 		} else {
 			var gamesModel = make([]*GameModel, 0)
 			for _, g := range games {
-				gamesModel = append(gamesModel, toModel(&g))
+				gamesModel = append(gamesModel, toModel(g))
 			}
 			e.Encode(gamesModel)
 		}
 	case http.MethodPost:
-		game := NewGame()
-		games = append(games, *game)
-		w.Header().Set("Location", fmt.Sprintf("%s%d", ApiUrl, game.id))
-		w.WriteHeader(http.StatusCreated)
+		path := strings.Trim(strings.TrimPrefix(r.RequestURI, ApiUrl), "/")
+		params := strings.Split(path, "/goal/")
+		var game *Game
+		if path != "" {
+			var ID int
+			var team Team
+			if len(params) < 2 {
+				BadRequest(w)
+				return
+			}
+			id, err := strconv.Atoi(params[0])
+			if err != nil {
+				BadRequest(w)
+				return
+			}
+			ID = id
+			if params[1] == "TeamA" {
+				team = TeamA
+			} else if params[1] == "TeamB" {
+				team = TeamB
+			} else {
+				BadRequest(w)
+				return
+			}
+			game = findGame(ID)
+			if game == nil {
+				http.NotFound(w, r)
+				return
+			}
+			game.AddScore(team)
+		} else {
+			game = NewGame()
+			games = append(games, game)
+			w.Header().Set("Location", fmt.Sprintf("%s%d", ApiUrl, game.id))
+			w.WriteHeader(http.StatusCreated)
+		}
 		e.Encode(toModel(game))
 	default:
 		http.NotFound(w, r)
