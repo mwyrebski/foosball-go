@@ -30,3 +30,10 @@ To start the server:
 ```
 go run .
 ```
+
+or with published executable:
+
+```
+go build
+foosball-go
+```
