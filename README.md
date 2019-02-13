@@ -37,3 +37,33 @@ or with published executable:
 go build
 foosball-go
 ```
+
+## API
+
+Following endpoints are handled by the server.
+
+Retrieving list of all games
+
+```
+GET /api/games/
+```
+
+Retrieving details of a game by ID
+
+```
+GET /api/games/{id}
+```
+
+Creating new game
+
+```
+POST /api/games/
+```
+
+Adding score for a team
+
+```
+POST /api/games/{id}/goal/{team}
+
+{team} = "TeamA" | "TeamB"
+```
