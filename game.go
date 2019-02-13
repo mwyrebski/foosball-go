@@ -9,6 +9,7 @@ const (
 )
 
 type Game struct {
+	id   int
 	sets []*Set
 }
 
@@ -70,8 +71,12 @@ func (g *Game) ScoreForTeam(t Team) int {
 	return score
 }
 
+var nextGameID int
+
 func NewGame() *Game {
+	nextGameID++
 	return &Game{
+		id:   nextGameID,
 		sets: make([]*Set, 0),
 	}
 }
