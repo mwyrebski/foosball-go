@@ -57,9 +57,9 @@ func handleGame(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		param := strings.TrimPrefix(strings.TrimRight(r.RequestURI, "/"), ApiUrl)
+		param := strings.Trim(strings.TrimPrefix(r.RequestURI, ApiUrl), "/")
 		var ID int
-		if len(param) > 0 {
+		if param != "" && len(param) > 0 {
 			id, err := strconv.Atoi(param)
 			if err != nil {
 				BadRequest(w)
